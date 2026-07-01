@@ -31,14 +31,14 @@ async function runTests() {
         await new Promise(r => setTimeout(r, 5000));
 
         // ==========================================
-        // 1. User Service (Port 3001)
+        // 1. User Service (via Kong Gateway Port 8000)
         // ==========================================
-        console.log("--- 1. Testing User Service (Port 3001) ---");
+        console.log("--- 1. Testing User Service (Port 8000) ---");
         const uniqueEmail = `testuser${Date.now()}@example.com`;
         
         console.log("-> Registering new user...");
         const registerRes = await request({
-            hostname: 'localhost', port: 3001, path: '/api/auth/register', method: 'POST',
+            hostname: 'localhost', port: 8000, path: '/api/auth/register', method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         }, {
             name: 'Test User', email: uniqueEmail, password: 'password123', role: 'CUSTOMER'
@@ -47,7 +47,7 @@ async function runTests() {
         
         console.log("-> Logging in...");
         const loginRes = await request({
-            hostname: 'localhost', port: 3001, path: '/api/auth/login', method: 'POST',
+            hostname: 'localhost', port: 8000, path: '/api/auth/login', method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         }, {
             email: uniqueEmail, password: 'password123'
@@ -61,12 +61,12 @@ async function runTests() {
         console.log("Login Successful! JWT Token acquired. User ID:", userId);
 
         // ==========================================
-        // 2. Restaurant Service (Port 8001)
+        // 2. Restaurant Service (via Kong Gateway Port 8000)
         // ==========================================
-        console.log("\n--- 2. Testing Restaurant Service (Port 8001) ---");
+        console.log("\n--- 2. Testing Restaurant Service (Port 8000) ---");
         console.log("-> Creating a restaurant...");
         const restRes = await request({
-            hostname: 'localhost', port: 8001, path: '/api/v1/restaurants', method: 'POST',
+            hostname: 'localhost', port: 8000, path: '/api/v1/restaurants', method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` }
         }, {
             name: "Test Restaurant", city: "Mumbai", cuisine: "Indian", 
@@ -82,12 +82,12 @@ async function runTests() {
 
 
         // ==========================================
-        // 3. Order Service (Port 8080)
+        // 3. Order Service (via Kong Gateway Port 8000)
         // ==========================================
-        console.log("\n--- 3. Testing Order Service (Port 8080) & Payment (Sync) ---");
+        console.log("\n--- 3. Testing Order Service (Port 8000) & Payment (Sync) ---");
         console.log("-> Creating an order...");
         const orderRes = await request({
-            hostname: 'localhost', port: 8080, path: '/api/orders', method: 'POST',
+            hostname: 'localhost', port: 8000, path: '/api/orders', method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` }
         }, {
             customerName: "Test User",

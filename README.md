@@ -110,3 +110,36 @@ node test_apis.js
 ```
 
 This script tests the entire transaction flow: **User Registration -> Restaurant Retrieval -> Order Creation -> Synchronous Payment processing -> Asynchronous Notification trigger**.
+
+---
+
+## 🌐 6. How the Deployment Works (Q&A Guide)
+
+If you are presenting this project for an interview, capstone review, or viva exam, here is exactly how to explain the deployment architecture:
+
+### Q1: Where is this system deployed?
+
+> **Answer**: The application is deployed locally inside a **Kubernetes cluster** orchestrated using **Minikube** (running on top of the **Docker Desktop** virtualization engine).
+
+### Q2: How are the services deployed and configured?
+
+> **Answer**:
+>
+> 1. **Containerization**: Every microservice is fully containerized using optimized, multi-stage, or slim base Docker images (`node:18-alpine`, `python:3.11-slim`, `eclipse-temurin:17-jre`).
+> 2. **Orchestration**:
+>    - **Infrastructure Layer (`/kubernetes/infra/`)**: Deploys PostgreSQL, MongoDB, Redis, ZooKeeper, and Apache Kafka as single-replica K8s Deployments, exposing them internally via `ClusterIP` Services.
+>    - **Application Layer (`/kubernetes/apps/`)**: Deploys our 5 microservices. They communicate internally using Kubernetes CoreDNS names (e.g. `zookeeper:2181` or `postgres:5432`) rather than hardcoded IP addresses.
+>    - **Gateway Layer (`/kubernetes/apps/kong.yaml`)**: Deploys the Kong API Gateway in DB-less mode. Kong's routing rules are loaded dynamically from a K8s ConfigMap with `strip_path: false` to ensure incoming request prefixes are routed unmodified to their respective backends.
+
+### Q3: How is the application accessed or exposed?
+
+> **Answer**:
+>
+> - In a cloud/production environment, we would expose the gateway using a `LoadBalancer` service type mapped to a public cloud IP or an Ingress Controller (like NGINX or Kong Ingress) mapped to a domain name.
+> - For local demonstration, we expose the system via **Port-Forwarding**:
+>   `kubectl port-forward service/kong 8000:8000`
+> - This securely bridges port `8000` of the Kong Gateway inside the cluster to `localhost:8000` on the developer's computer. Any API client (or frontend) can then send all traffic through this single endpoint.
+
+### Q4: Why is there a single entrypoint (Kong Gateway)?
+
+> **Answer**: The Kong Gateway serves as the single entrypoint for the system. Instead of exposing individual database or microservice ports to the outside world, Kong acts as a reverse proxy. It routes requests dynamically, enforces CORS policies, and applies global rate limiting (configured at 100 requests/minute) to protect the backend services from abuse.
