@@ -162,7 +162,7 @@ services:
       - kafka
       - redis
   kong:
-    image: kong:3.4-alpine
+    image: kong:alpine
     container_name: kong-gateway
     environment:
       KONG_DATABASE: "off"
