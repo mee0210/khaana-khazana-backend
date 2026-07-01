@@ -1,0 +1,284 @@
+openapi: 3.0.3
+info:
+  title: User Service API Spec - Khaana Khazana
+  description: |
+    API specifications for the User Service microservice.
+    Handles user registration, login, token refresh, and profile fetching.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+paths:
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      description: Validates email, password, and name, hashes the password, and creates a user record in the DB.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - name
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  minLength: 6
+                  example: securePassword123
+                name:
+                  type: string
+                  example: Meenakshi
+      responses:
+        "201":
+          description: User registered successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User registered successfully.
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        example: 3c5d6e24-9b2f-4882-84bb-7319ea6d814c
+                      email:
+                        type: string
+                        format: email
+                        example: user@example.com
+                      name:
+                        type: string
+                        example: Meenakshi
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: 2026-06-25T12:00:00.000Z
+        "400":
+          description: Validation error or email already exists.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Email is already registered.
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: field
+                        value:
+                          type: string
+                          example: short
+                        msg:
+                          type: string
+                          example: Password must be at least 6 characters long.
+                        path:
+                          type: string
+                          example: password
+                        location:
+                          type: string
+                          example: body
+        "500":
+          description: Internal server error.
+  /api/auth/login:
+    post:
+      summary: Log in an existing user
+      description: Verifies credentials, generates a short-lived access JWT and a long-lived refresh JWT.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  example: securePassword123
+      responses:
+        "200":
+          description: Login successful. Returns access token (expires in 15m) and refresh token (expires in 7d).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Login successful.
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIzYzVkNmUyNC05YjJmLTQ4ODItODRiYi03MzE5ZWE2ZDgxNGMiLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3MTY4ODQwMDAsImV4cCI6MTcxNjg4NDkwMH0.signature
+                  refreshToken:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIzYzVkNmUyNC05YjJmLTQ4ODItODRiYi03MzE5ZWE2ZDgxNGMiLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3MTY4ODQwMDAsImV4cCI6MTcxNzQ4ODgwMH0.signature
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        example: 3c5d6e24-9b2f-4882-84bb-7319ea6d814c
+                      email:
+                        type: string
+                        format: email
+                        example: user@example.com
+                      name:
+                        type: string
+                        example: Meenakshi
+        "401":
+          description: Invalid email or password.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid email or password.
+        "429":
+          description: Too many requests (Rate-limit exceeded).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Too many login attempts from this IP. Please try again after 15 minutes.
+  /api/auth/refresh:
+    post:
+      summary: Refresh access token
+      description: Takes a refresh token and issues a new access token if valid.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      responses:
+        "200":
+          description: Token refreshed. Returns a new access token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        "401":
+          description: Invalid or expired refresh token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Refresh token has expired. Please log in again.
+  /api/auth/verify:
+    get:
+      summary: Verify access token
+      description: Validates the JWT and returns the parsed payload. Used by other microservices.
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Token is valid.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                    example: true
+                  user:
+                    type: object
+                    properties:
+                      userId:
+                        type: string
+                        format: uuid
+                        example: 3c5d6e24-9b2f-4882-84bb-7319ea6d814c
+                      email:
+                        type: string
+                        format: email
+                        example: user@example.com
+                      iat:
+                        type: integer
+                        example: 1716884000
+                      exp:
+                        type: integer
+                        example: 1716884900
+        "401":
+          description: Unauthenticated (Missing/Expired Token).
+        "403":
+          description: Unauthorized (Invalid Token).
+  /api/users/me:
+    get:
+      summary: Fetch user profile
+      description: Retrieves profile details of the currently logged-in user.
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: User profile retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    example: 3c5d6e24-9b2f-4882-84bb-7319ea6d814c
+                  email:
+                    type: string
+                    format: email
+                    example: user@example.com
+                  name:
+                    type: string
+                    example: Meenakshi
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: 2026-06-25T12:00:00.000Z
+        "401":
+          description: Unauthenticated.
+        "404":
+          description: User profile not found in database.
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,59 @@
+# ==============================================================================
+# Global Gitignore - Khaana Khazana (TCS Capstone Project)
+# ==============================================================================
+
+# Database / Local Variables Configurations
+# Prevents uploading local database credentials, passwords and private JWT secrets
+.env
+.env.local
+.env.development
+.env.staging
+.env.production
+*.env
+
+# Dependency Directories
+node_modules/
+jspm_packages/
+web_modules/
+
+# Python caching & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Java / Spring Boot Build Outputs
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.war
+*.ear
+*.jar
+.metadata/
+.classpath
+.project
+.settings/
+.factorypath
+.springBeans
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs & Text Editors Configuration
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

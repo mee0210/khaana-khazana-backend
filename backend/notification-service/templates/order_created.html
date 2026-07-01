@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .header { background: linear-gradient(135deg, #ff6b6b, #f03e3e); padding: 30px 20px; text-align: center; color: white; }
+        .header h1 { margin: 0; font-size: 28px; font-weight: 600; }
+        .header p { margin: 10px 0 0; opacity: 0.9; }
+        .content { padding: 30px; }
+        .order-details { background: #f8f9fa; border-radius: 8px; padding: 20px; margin-top: 20px; }
+        .restaurant { font-size: 18px; font-weight: 600; color: #d6336c; margin-bottom: 15px; border-bottom: 2px solid #ffe3e3; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px 0; border-bottom: 1px solid #eee; text-align: left; }
+        th { font-weight: 600; color: #868e96; text-transform: uppercase; font-size: 12px; }
+        .total-row td { font-size: 18px; font-weight: bold; color: #333; border-bottom: none; padding-top: 15px; }
+        .footer { text-align: center; padding: 20px; color: #adb5bd; font-size: 14px; background: #fafafa; border-top: 1px solid #eee; }
+        .logo { width: 60px; height: 60px; background: white; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🍲</div>
+            <h1>Order Confirmed!</h1>
+            <p>Your order #{{ order_id }} is being prepared.</p>
+        </div>
+        <div class="content">
+            <p>Hi there,</p>
+            <p>Great news! We've received your order and the restaurant is starting to prepare it. Here are your order details:</p>
+            
+            <div class="order-details">
+                <div class="restaurant">{{ restaurant_name | default("Khaana Khazana Restaurant") }}</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th style="text-align: center;">Qty</th>
+                            <th style="text-align: right;">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if items %}
+                            {% for item in items %}
+                            <tr>
+                                <td>{{ item.itemName }}</td>
+                                <td style="text-align: center;">{{ item.quantity }}</td>
+                                <td style="text-align: right;">${{ item.price }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% endif %}
+                        <tr class="total-row">
+                            <td colspan="2">Total Amount</td>
+                            <td style="text-align: right; color: #f03e3e;">${{ total_amount }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <p style="margin-top: 25px; line-height: 1.6;">Sit back and relax while we get your delicious food ready. We will notify you once it's out for delivery.</p>
+        </div>
+        <div class="footer">
+            &copy; 2026 Khaana Khazana. Bringing joy to your doorstep.
+        </div>
+    </div>
+</body>
+</html>

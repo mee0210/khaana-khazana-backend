@@ -1,0 +1,89 @@
+openapi: 3.0.0
+info:
+  title: Payment Service API
+  version: 1.0.0
+  description: Handles payment processing, idempotency, and simulates circuit breaker failures for Khaana Khazana.
+
+servers:
+  - url: http://localhost:3002
+    description: Local development server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/payments:
+    post:
+      summary: Process a new payment
+      description: Validates idempotency key and simulates payment success or failure.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - orderId
+                - userId
+                - amount
+                - idempotencyKey
+              properties:
+                orderId:
+                  type: string
+                  format: uuid
+                userId:
+                  type: string
+                  format: uuid
+                amount:
+                  type: number
+                  format: float
+                idempotencyKey:
+                  type: string
+      responses:
+        '201':
+          description: Payment processed successfully
+        '200':
+          description: Idempotent cached response returned
+
+  /api/payments/{paymentId}:
+    get:
+      summary: Get payment by ID
+      parameters:
+        - in: path
+          name: paymentId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Payment details
+
+  /api/payments/order/{orderId}:
+    get:
+      summary: Get payment attempts by Order ID
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of payment attempts for the order
+
+  /api/payments/simulate-failure:
+    post:
+      summary: Toggle simulate failure flag
+      security: []
+      responses:
+        '200':
+          description: Toggled circuit failure simulation

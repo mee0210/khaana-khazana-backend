@@ -1,0 +1,54 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: user-service
+    url: http://user-service:5000
+    routes:
+      - name: user-routes
+        paths:
+          - /api/auth
+          - /api/users
+  - name: restaurant-service
+    url: http://restaurant-service:8000
+    routes:
+      - name: restaurant-routes
+        paths:
+          - /api/v1/restaurants
+          - /api/v1/search
+  - name: order-service
+    url: http://order-service:8080
+    routes:
+      - name: order-routes
+        paths:
+          - /api/orders
+  - name: payment-service
+    url: http://payment-service:3002
+    routes:
+      - name: payment-routes
+        paths:
+          - /api/payments
+
+plugins:
+  - name: rate-limiting
+    config:
+      minute: 100
+      policy: local
+  - name: cors
+    config:
+      origins:
+        - "*"
+      headers:
+        - Accept
+        - Accept-Version
+        - Content-Length
+        - Content-MD5
+        - Content-Type
+        - Date
+        - Authorization
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS

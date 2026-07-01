@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .header { background: linear-gradient(135deg, #495057, #343a40); padding: 30px 20px; text-align: center; color: white; }
+        .header h1 { margin: 0; font-size: 28px; font-weight: 600; }
+        .header p { margin: 10px 0 0; opacity: 0.9; }
+        .content { padding: 30px; }
+        .alert-box { background: #f8d7da; border-left: 4px solid #dc3545; color: #721c24; padding: 15px; border-radius: 4px; margin-bottom: 20px; font-weight: 500; }
+        .footer { text-align: center; padding: 20px; color: #adb5bd; font-size: 14px; background: #fafafa; border-top: 1px solid #eee; }
+        .logo { width: 60px; height: 60px; background: white; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">❌</div>
+            <h1>Order Cancelled</h1>
+            <p>Order #{{ order_id }} has been cancelled.</p>
+        </div>
+        <div class="content">
+            <p>Hi there,</p>
+            <div class="alert-box">
+                Your order was cancelled successfully.
+            </div>
+            <p>Any charges made to your card have been refunded and should reflect in your account shortly.</p>
+            <p>We hope to serve you again soon!</p>
+        </div>
+        <div class="footer">
+            &copy; 2026 Khaana Khazana. Bringing joy to your doorstep.
+        </div>
+    </div>
+</body>
+</html>

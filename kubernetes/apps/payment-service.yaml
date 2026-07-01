@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  labels:
+    app: payment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+    spec:
+      containers:
+        - name: payment-service
+          image: payment-service:latest
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: "3002"
+            - name: DB_USER
+              value: "postgres"
+            - name: DB_PASSWORD
+              value: "password123"
+            - name: DB_HOST
+              value: "postgres"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "khaana_khazana"
+            - name: JWT_SECRET
+              value: "superSecretAccessKey2026!"
+          ports:
+            - containerPort: 3002
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+spec:
+  selector:
+    app: payment-service
+  ports:
+    - port: 3002
+      targetPort: 3002
+  type: ClusterIP

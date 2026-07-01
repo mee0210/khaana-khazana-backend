@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restaurant-service
+  labels:
+    app: restaurant-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: restaurant-service
+  template:
+    metadata:
+      labels:
+        app: restaurant-service
+    spec:
+      containers:
+        - name: restaurant-service
+          image: restaurant-service:latest
+          imagePullPolicy: Never
+          env:
+            - name: MONGODB_URL
+              value: "mongodb://mongodb:27017"
+            - name: DATABASE_NAME
+              value: "restaurant_db"
+            - name: JWT_SECRET
+              value: "superSecretAccessKey2026!"
+          ports:
+            - containerPort: 8000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: restaurant-service
+spec:
+  selector:
+    app: restaurant-service
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: ClusterIP
